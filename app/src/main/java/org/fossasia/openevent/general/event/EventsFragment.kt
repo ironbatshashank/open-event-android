@@ -6,11 +6,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.navigation.Navigation.findNavController
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.content_no_internet.view.noInternetCard
@@ -23,7 +22,9 @@ import kotlinx.android.synthetic.main.fragment_events.view.progressBar
 import kotlinx.android.synthetic.main.fragment_events.view.shimmerEvents
 import kotlinx.android.synthetic.main.fragment_events.view.swiperefresh
 import kotlinx.android.synthetic.main.fragment_events.view.noEventsMessage
+import kotlinx.android.synthetic.main.fragment_events.view.eventsNestedScrollView
 import org.fossasia.openevent.general.R
+import org.fossasia.openevent.general.ScrollToTop
 import org.fossasia.openevent.general.common.EventClickListener
 import org.fossasia.openevent.general.common.FavoriteFabClickListener
 import org.fossasia.openevent.general.common.ShareFabClickListener
@@ -39,6 +40,7 @@ import org.koin.androidx.scope.ext.android.bindScope
 import org.koin.androidx.scope.ext.android.getOrCreateScope
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
+import org.fossasia.openevent.general.utils.Utils.setToolbar
 
 /**
  * Enum class for different layout types in the adapter.
@@ -52,7 +54,7 @@ const val EVENT_DATE_FORMAT: String = "eventDateFormat"
 const val RELOADING_EVENTS: Int = 0
 const val INITIAL_FETCHING_EVENTS: Int = 1
 
-class EventsFragment : Fragment() {
+class EventsFragment : Fragment(), ScrollToTop {
     private val eventsViewModel by viewModel<EventsViewModel>()
     private lateinit var rootView: View
     private val preference = Preference()
@@ -84,17 +86,12 @@ class EventsFragment : Fragment() {
         if (preference.getString(SAVED_LOCATION).isNullOrEmpty()) {
             findNavController(requireActivity(), R.id.frameContainer).navigate(R.id.welcomeFragment)
         }
-
-        val thisActivity = activity
-        if (thisActivity is AppCompatActivity) {
-            thisActivity.supportActionBar?.show()
-            thisActivity.supportActionBar?.title = "Events"
-            thisActivity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        }
+        setToolbar(activity, "Events", false)
 
         rootView.progressBar.isIndeterminate = true
 
-        rootView.eventsRecycler.layoutManager = LinearLayoutManager(activity)
+        rootView.eventsRecycler.layoutManager =
+            GridLayoutManager(activity, resources.getInteger(R.integer.events_column_count))
 
         rootView.eventsRecycler.adapter = eventsListAdapter
         rootView.eventsRecycler.isNestedScrollingEnabled = false
@@ -208,4 +205,6 @@ class EventsFragment : Fragment() {
         rootView.swiperefresh?.setOnRefreshListener(null)
         super.onStop()
     }
+
+    override fun scrollToTop() = rootView.eventsNestedScrollView.smoothScrollTo(0, 0)
 }

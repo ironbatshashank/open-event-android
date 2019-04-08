@@ -30,6 +30,12 @@
             android:name="eventTopicId"
             app:argType="long"
             android:defaultValue="-1L"/>
+
+        <argument
+            android:name="eventLocation"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null"/>
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
@@ -38,6 +44,11 @@
         tools:layout="@layout/fragment_search" >
         <argument
             android:name="@string/saved_date"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true"/>
+        <argument
+            android:name="@string/savedType"
             app:argType="string"
             android:defaultValue="@null"
             app:nullable="true"/>
@@ -66,6 +77,18 @@
             android:defaultValue="@null"/>
     </fragment>
     <fragment
+        android:id="@+id/searchTypeFragment"
+        android:name="org.fossasia.openevent.general.search.SearchTypeFragment"
+        android:label="SearchTypeFragment"
+        tools:layout="@layout/fragment_search_type">
+
+        <argument
+            android:name="type"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null"/>
+    </fragment>
+    <fragment
         android:id="@+id/searchResultsFragment"
         android:name="org.fossasia.openevent.general.search.SearchResultsFragment"
         android:label="SearchResultsFragment"
@@ -85,6 +108,11 @@
             android:name="date"
             app:argType="string"
             android:defaultValue="''"/>
+
+        <argument
+            android:name="type"
+            app:argType="string"
+            android:defaultValue="''"/>
     </fragment>
     <fragment
         android:id="@+id/favoriteFragment"
@@ -95,7 +123,13 @@
         android:id="@+id/orderUnderUserFragment"
         android:name="org.fossasia.openevent.general.order.OrdersUnderUserFragment"
         android:label="OrdersUnderUserFragment"
-        tools:layout="@layout/fragment_orders_under_user" />
+        tools:layout="@layout/fragment_orders_under_user">
+
+        <argument
+            android:name="showExpired"
+            app:argType="boolean"
+            android:defaultValue="false"/>
+    </fragment>
     <fragment
         android:id="@+id/orderDetailsFragment"
         android:name="org.fossasia.openevent.general.order.OrderDetailsFragment"

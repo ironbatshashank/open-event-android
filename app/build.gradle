@@ -15,10 +15,10 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.eventyay.attendee"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 28
-        versionCode 3
-        versionName "0.0.3a"
+        versionCode 6
+        versionName "0.1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -33,6 +33,7 @@ android {
     }
     buildTypes {
         release {
+            shrinkResources true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "String", "DEFAULT_BASE_URL", '"https://api.eventyay.com/v1/"'
@@ -72,6 +73,9 @@ android {
     androidExtensions {
         experimental = true
     }
+    aaptOptions {
+        cruncherEnabled = false
+    }
 }
 
 spotless {
@@ -88,21 +92,21 @@ repositories {
 }
 
 dependencies {
-    def lifecycle_version = "2.1.0-alpha03"
+    def lifecycle_version = "2.1.0-alpha04"
     def koin_version = "1.0.2"
     def roomVersion = "2.1.0-alpha06"
     def ktx_version = "1.0.0"
     def ktx2_version = "2.0.0"
-    def nav_version = "2.1.0-alpha01"
-    def anko_version = "0.10.6"
+    def nav_version = "2.1.0-alpha02"
+    def anko_version = "0.10.8"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'androidx.appcompat:appcompat:1.1.0-alpha03'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha3'
+    implementation 'androidx.appcompat:appcompat:1.1.0-alpha04'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha4'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha03'
-    implementation 'com.google.android.material:material:1.1.0-alpha04'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha04'
+    implementation 'com.google.android.material:material:1.1.0-alpha05'
     implementation "androidx.browser:browser:1.0.0"
     implementation 'androidx.exifinterface:exifinterface:1.0.0'
     implementation "androidx.lifecycle:lifecycle-extensions:${lifecycle_version}"
@@ -147,14 +151,14 @@ dependencies {
 
     // RxJava
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.7'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.8'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
 
     // Picasso
     implementation 'com.squareup.picasso:picasso:2.71828'
 
     // Stripe
-    implementation 'com.stripe:stripe-android:8.5.0'
+    implementation 'com.stripe:stripe-android:8.6.0'
 
     // QR Code
     implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
@@ -172,11 +176,8 @@ dependencies {
     releaseImplementation 'com.github.iamareebjamal:stetho-noop:1.2.1'
     testImplementation 'com.github.iamareebjamal:stetho-noop:1.2.1'
 
-    //Mapbox SDK plugins
-    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-places-v7:0.7.0'
-
     testImplementation 'junit:junit:4.12'
-    testImplementation "io.mockk:mockk:1.9.2"
+    testImplementation "io.mockk:mockk:1.9.3"
     testImplementation 'org.threeten:threetenbp:1.3.8'
     testImplementation "org.koin:koin-test:$koin_version"
     testImplementation 'androidx.arch.core:core-testing:2.0.1'

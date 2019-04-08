@@ -1,50 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/favoriteCoordinatorLayout">
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-       <LinearLayout
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"
-           android:orientation="vertical">
-           <LinearLayout
-               android:layout_width="match_parent"
-               android:layout_height="match_parent"
-               android:orientation="vertical"
-               android:layout_gravity="center"
-               android:gravity="center_vertical"
-               android:textAlignment="center"
-               android:id="@+id/noLikedText"
-               android:layout_margin="@dimen/layout_margin_small">
-               <TextView
-                   android:layout_width="match_parent"
-                   android:layout_height="wrap_content"
-                   android:text="@string/nothing_planned_yet"
-                   android:textSize="@dimen/text_size_large"
-                   android:layout_gravity="center_horizontal"
-                   android:textAlignment="center"/>
-               <TextView
-                   android:id="@+id/findSomethingToDo"
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textAlignment="center"
+            android:orientation="vertical"
+            android:id="@+id/noLikedLL"
+            android:layout_margin="@dimen/layout_margin_small">
+
+           <TextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:textSize="@dimen/text_size_expanded_title_medium"
+               android:textStyle="bold"
+               android:layout_gravity="center_horizontal"
+               android:text="@string/find_something_to_do"
+               android:textColor="@color/black"
+               android:id="@+id/findText"/>
+
+           <com.google.android.material.chip.ChipGroup
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:id="@+id/chipGroup"
+               android:layout_gravity="center_horizontal"
+               android:orientation="horizontal"
+               android:layout_marginTop="@dimen/view_height_25dp"
+               app:chipSpacingHorizontal="@dimen/view_height_25dp"
+               app:chipSpacingVertical="@dimen/divider_margin_top">
+               <com.google.android.material.chip.Chip
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content"
-                   android:layout_gravity="center_horizontal"
-                   android:layout_marginTop="@dimen/layout_margin_large"
-                   android:text="@string/find_something_to_do"
-                   android:textColor="@color/colorPrimary"
-                   android:textSize="@dimen/text_size_large" />
+                   android:text="@string/today"
+                   android:id="@+id/todayChip"/>
+
+               <com.google.android.material.chip.Chip
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="@string/tomorrow"
+                   android:id="@+id/tomorrowChip"/>
+
+               <com.google.android.material.chip.Chip
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="@string/weekend"
+                   android:id="@+id/weekendChip"/>
+
+               <com.google.android.material.chip.Chip
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="@string/month"
+                   android:textSize="@dimen/text_size_small"
+                   android:id="@+id/monthChip"/>
+           </com.google.android.material.chip.ChipGroup>
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:gravity="center_horizontal"
+               android:orientation="horizontal"
+               android:padding="@dimen/view_height_25dp">
+
+               <ImageView
+                   android:layout_width="@dimen/event_details_divider_margin"
+                   android:layout_height="@dimen/event_details_divider_margin"
+                   android:layout_gravity="center_vertical"
+                   app:srcCompat="@drawable/ic_baseline_favorite"
+                   android:id="@+id/likeIcon"
+                   android:layout_marginRight="@dimen/layout_margin_large"/>
+
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:textSize="@dimen/text_size_small"
+                   android:layout_gravity="center_vertical"
+                   android:text="@string/remember_like"
+                   android:id="@+id/likeText"/>
            </LinearLayout>
+       </LinearLayout>
 
         <ProgressBar
             android:layout_gravity="center"
             android:id="@+id/favoriteProgressBar"
             android:visibility="gone"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content">
         </ProgressBar>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -52,7 +101,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scrollbars="vertical" />
-       </LinearLayout>
     </FrameLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

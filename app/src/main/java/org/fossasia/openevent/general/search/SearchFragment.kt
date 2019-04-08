@@ -7,19 +7,27 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
 import kotlinx.android.synthetic.main.fragment_search.view.fabSearch
 import kotlinx.android.synthetic.main.fragment_search.view.locationTextView
 import kotlinx.android.synthetic.main.fragment_search.view.timeTextView
+import kotlinx.android.synthetic.main.fragment_search.view.eventTypeTextView
 import org.fossasia.openevent.general.R
 import org.fossasia.openevent.general.utils.nullToEmpty
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.navigation.Navigation
 import org.fossasia.openevent.general.MainActivity
+import org.fossasia.openevent.general.event.EventUtils.getFormattedDate
+import org.fossasia.openevent.general.event.EventUtils.getFormattedDateWithoutYear
 import org.fossasia.openevent.general.utils.Utils.getAnimSlide
+import org.threeten.bp.LocalDate
+import org.threeten.bp.ZoneId
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.DateTimeParseException
+import java.util.Calendar
+import org.fossasia.openevent.general.utils.Utils.setToolbar
 
 class SearchFragment : Fragment() {
     private val searchViewModel by viewModel<SearchViewModel>()
@@ -39,11 +47,7 @@ class SearchFragment : Fragment() {
     ): View? {
         rootView = inflater.inflate(R.layout.fragment_search, container, false)
 
-        val thisActivity = activity
-        if (thisActivity is AppCompatActivity) {
-            thisActivity.supportActionBar?.title = getString(R.string.search)
-            thisActivity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        }
+        setToolbar(activity, getString(R.string.search), false)
         setHasOptionsMenu(true)
 
         rootView.timeTextView.setOnClickListener {
@@ -57,7 +61,21 @@ class SearchFragment : Fragment() {
         }
 
         val time = safeArgs?.stringSavedDate
-        rootView.timeTextView.text = time ?: getString(R.string.anytime)
+        if (time.isNullOrBlank()) rootView.timeTextView.text = getString(R.string.anytime)
+        else {
+            try {
+                val zonedDate =
+                    LocalDate.parse(time, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                        .atStartOfDay(ZoneId.systemDefault()).plusDays(-1)
+                if (zonedDate.year == Calendar.getInstance().get(Calendar.YEAR))
+                    rootView.timeTextView.text = getFormattedDateWithoutYear(zonedDate)
+                else rootView.timeTextView.text = getFormattedDate(zonedDate)
+            } catch (e: DateTimeParseException) {
+                rootView.timeTextView.text = time
+            }
+        }
+        val type = safeArgs?.stringSavedType
+        rootView.eventTypeTextView.text = if (type.isNullOrBlank()) getString(R.string.anything) else type
 
         searchViewModel.loadSavedLocation()
         rootView.locationTextView.text = searchViewModel.savedLocation
@@ -69,6 +87,16 @@ class SearchFragment : Fragment() {
                 .toBundle()
                 .also { bundle ->
                     Navigation.findNavController(rootView).navigate(R.id.searchLocationFragment, bundle, getAnimSlide())
+                }
+        }
+
+        rootView.eventTypeTextView.setOnClickListener {
+            SearchLocationFragmentArgs.Builder()
+                .setFromSearchFragment(true)
+                .build()
+                .toBundle()
+                .also { bundle ->
+                    Navigation.findNavController(rootView).navigate(R.id.searchTypeFragment, bundle, getAnimSlide())
                 }
         }
 
@@ -94,13 +122,15 @@ class SearchFragment : Fragment() {
         val searchItem = menu.findItem(R.id.search_item)
         val thisActivity = activity
         if (thisActivity is MainActivity) searchView = SearchView(thisActivity.supportActionBar?.themedContext)
+        searchView.maxWidth = Int.MAX_VALUE
         searchItem.actionView = searchView
         val queryListener = object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 SearchResultsFragmentArgs.Builder()
                     .setQuery(query)
                     .setLocation(rootView.locationTextView.text.toString().nullToEmpty())
-                    .setDate(rootView.timeTextView.text.toString().nullToEmpty())
+                    .setDate((safeArgs?.stringSavedDate ?: getString(R.string.anytime)).nullToEmpty())
+                    .setType((safeArgs?.stringSavedType ?: getString(R.string.anything)).nullToEmpty())
                     .build()
                     .toBundle()
                     .also { bundle ->

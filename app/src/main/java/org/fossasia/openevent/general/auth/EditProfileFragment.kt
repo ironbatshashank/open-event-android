@@ -2,7 +2,7 @@ package org.fossasia.openevent.general.auth
 
 import android.Manifest
 import android.app.Activity
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -22,11 +22,12 @@ import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_edit_profile.view.editProfileCoordinatorLayout
-import kotlinx.android.synthetic.main.fragment_edit_profile.view.buttonUpdate
+import kotlinx.android.synthetic.main.fragment_edit_profile.view.updateButton
 import kotlinx.android.synthetic.main.fragment_edit_profile.view.firstName
 import kotlinx.android.synthetic.main.fragment_edit_profile.view.lastName
 import kotlinx.android.synthetic.main.fragment_edit_profile.view.profilePhoto
 import kotlinx.android.synthetic.main.fragment_edit_profile.view.progressBar
+import kotlinx.android.synthetic.main.fragment_edit_profile.view.profilePhotoFab
 import org.fossasia.openevent.general.CircleTransform
 import org.fossasia.openevent.general.MainActivity
 import org.fossasia.openevent.general.R
@@ -38,6 +39,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
+import org.fossasia.openevent.general.utils.Utils.setToolbar
 
 class EditProfileFragment : Fragment() {
 
@@ -67,10 +69,10 @@ class EditProfileFragment : Fragment() {
                 userFirstName = it.firstName.nullToEmpty()
                 userLastName = it.lastName.nullToEmpty()
                 val imageUrl = it.avatarUrl.nullToEmpty()
-                if (rootView.firstName.text.isBlank()) {
+                if (rootView.firstName.text.isNullOrBlank()) {
                     rootView.firstName.setText(userFirstName)
                 }
-                if (rootView.lastName.text.isBlank()) {
+                if (rootView.lastName.text.isNullOrBlank()) {
                     rootView.lastName.setText(userLastName)
                 }
                 if (!imageUrl.isEmpty() && !avatarUpdated) {
@@ -103,15 +105,7 @@ class EditProfileFragment : Fragment() {
         permissionGranted = (ContextCompat.checkSelfPermission(requireContext(),
             Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
 
-        rootView.profilePhoto.setOnClickListener {
-            if (permissionGranted) {
-                showFileChooser()
-            } else {
-                requestPermissions(READ_STORAGE, REQUEST_CODE)
-            }
-        }
-
-        rootView.buttonUpdate.setOnClickListener {
+        rootView.updateButton.setOnClickListener {
             hideSoftKeyboard(context, rootView)
             editProfileViewModel.updateProfile(encodedImage, rootView.firstName.text.toString(),
                 rootView.lastName.text.toString())
@@ -121,11 +115,19 @@ class EditProfileFragment : Fragment() {
             .nonNull()
             .observe(viewLifecycleOwner, Observer {
                 Snackbar.make(rootView.editProfileCoordinatorLayout, it, Snackbar.LENGTH_LONG).show()
-                if (it == USER_UPDATED) {
+                if (it == getString(R.string.user_update_success_message)) {
                     val thisActivity = activity
                     if (thisActivity is MainActivity) thisActivity.onSuperBackPressed()
                 }
             })
+
+        rootView.profilePhotoFab.setOnClickListener {
+            if (permissionGranted) {
+                showFileChooser()
+            } else {
+                requestPermissions(READ_STORAGE, REQUEST_CODE)
+            }
+        }
 
         return rootView
     }
@@ -165,7 +167,7 @@ class EditProfileFragment : Fragment() {
         val intent = Intent()
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
-        startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE_REQUEST)
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.select_image)), PICK_IMAGE_REQUEST)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -179,9 +181,7 @@ class EditProfileFragment : Fragment() {
     }
 
     override fun onResume() {
-        val activity = activity as? AppCompatActivity
-        activity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        activity?.supportActionBar?.title = "Edit Profile"
+        setToolbar(activity, "Edit Profile")
         setHasOptionsMenu(true)
         super.onResume()
     }
@@ -195,12 +195,12 @@ class EditProfileFragment : Fragment() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 permissionGranted = true
                 Snackbar.make(
-                    rootView.editProfileCoordinatorLayout, "Permission to Access External Storage Granted !",
+                    rootView.editProfileCoordinatorLayout, getString(R.string.storage_permission_granted_message),
                     Snackbar.LENGTH_SHORT).show()
                 showFileChooser()
             } else {
                 Snackbar.make(
-                    rootView.editProfileCoordinatorLayout, "Permission to Access External Storage Denied :(",
+                    rootView.editProfileCoordinatorLayout, getString(R.string.storage_permission_denied_message),
                     Snackbar.LENGTH_SHORT).show()
             }
         }
@@ -216,7 +216,7 @@ class EditProfileFragment : Fragment() {
             if (thisActivity is MainActivity) thisActivity.onSuperBackPressed()
         } else {
             hideSoftKeyboard(context, rootView)
-            val dialog = AlertDialog.Builder(context)
+            val dialog = AlertDialog.Builder(requireContext())
             dialog.setMessage(getString(R.string.changes_not_saved))
             dialog.setNegativeButton(getString(R.string.discard)) { _, _ ->
                 if (thisActivity is MainActivity) thisActivity.onSuperBackPressed()
